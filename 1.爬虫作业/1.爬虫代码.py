@@ -10,7 +10,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 # ===================== 核心配置（精准匹配需求） =====================
-SAVE_DIR = r"E:\py\practice\zpy"          
+SAVE_DIR = r"E:\py\practice"          
 PDF_SAVE_DIR = os.path.join(SAVE_DIR, "pdf")  
 MAX_PAGE = 311                             # 网页实际总页数（精准爬取无无效页）
 TARGET_DATA_COUNT = 7762                   # 目标爬取全部7762条

@@ -1,0 +1,37 @@
+name: Auto Update Directory Tree
+
+# 触发条件：推送到 main 分支时执行
+on:
+  push:
+    branches: [ main ]
+    # 仅监控目录和README变化，避免无意义触发
+    paths:
+      - '**/*'
+      - 'README.md'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Tree Command
+        run: sudo apt-get install -y tree
+
+      - name: Generate Directory Tree
+        run: |
+          # 生成目录树，排除隐藏文件、venv和__pycache__，缩进2个空格
+          tree -F --noreport -I ".git|venv|__pycache__|*.pyc|*.pdf" --dirsfirst -i -T 2 > temp_tree.txt
+
+      - name: Inject Tree into README
+        run: |
+          # 使用 sed 命令替换 README 中的指定区域
+          sed -i '/<!-- AUTO-GENERATED-CONTENT:START (DIRECTORY_TREE) -->/,/<!-- AUTO-GENERATED-CONTENT:END -->/c\<!-- AUTO-GENERATED-CONTENT:START (DIRECTORY_TREE) -->\```text\n'"$(cat temp_tree.txt)"'\n```\n<!-- AUTO-GENERATED-CONTENT:END -->' README.md
+          rm temp_tree.txt
+
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: auto update directory tree"
+          file_pattern: "README.md"
